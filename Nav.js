@@ -21,6 +21,10 @@ import PropTypes from "prop-types";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Paper from "@material-ui/core/Paper";
 import { Button } from "@material-ui/core";
+import { Switch, Route, Link, BrowserRouter } from "react-router-dom";
+import NewOrders from "./NewOrders.js"
+import Dashboard from "./Dashboard.js"
+import CurrentOrders from "./CurrentOrders.js"
 
 const drawerWidth = 240;
 
@@ -62,14 +66,23 @@ class Nav extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      drawerOpen: false
+      drawerOpen: false,
+      orderArray: []
     };
+  }
+
+  arrayCallback = (arr) => {
+    var temp = this.state.orderArray
+    temp.push(arr)
+    this.setState({orderArray : temp });
   }
 
   render() {
     const { classes } = this.props;
     return (
+      
       <ThemeProvider theme={theme}>
+        <BrowserRouter>
         <div>
           <AppBar position="fixed">
             <Toolbar>
@@ -107,53 +120,27 @@ class Nav extends Component {
           </IconButton>
           <Divider />
           <List>
-            {["Dashboard", "New Orders", "Placed Orders ", "Ready Orders"].map(
+            {["Dashboard", "New Orders", "Current Orders", "Ready Orders"].map(
               (text, index) => (
-                <ListItem button key={text}>
+                <ListItem button key={text} onClick = {()=>{this.setState({ drawerOpen : false})}} component={Link} to={"/" + text}>
                   <ListItemText primary={text} />
                 </ListItem>
               )
             )}
           </List>
         </Drawer>
+        
+        
         <main>
-          <div style={{ padding: "30px" }} />
-          <div style={{ padding: "10px" }}>
-            <Typography variant="h5" color="primary">
-              NEW ORDERS ARRIVED :
-            </Typography>
-          </div>
-          <List>
-            {[
-              "Dashboard",
-              "New Orders",
-              "Placed Orders ",
-              "Ready Orders",
-              "a",
-              "b",
-              "c"
-            ].map((text, index) => (
-              <Paper elevation={3}>
-                <ListItem button key={text} style={{ padding: "30px" }}>
-                  <ListItemText style={{ padding: "5px" }}>
-                    <text>
-                      {" "}
-                      Order id: x
-                      &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
-                      Qty : y <br /> Order Name : XYZ <br /> Token no. xxx
-                    </text>
-                  </ListItemText>
-                  <ListItemSecondaryAction>
-                    <Button variant="outlined" color="primary">
-                      Send to kitchen
-                    </Button>
-                  </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-              </Paper>
-            ))}
-          </List>
+         
+          <Switch>
+            <Route exact path="/" render={() => <div>Home Page</div>} />
+            <Route path="/Dashboard"  render = {() => <Dashboard/>} />
+            <Route path="/New Orders" render = {() => <NewOrders parentCallback = {this.arrayCallback.bind(this)}/>} />
+            <Route path="/Current Orders" render = {() => <CurrentOrders orderArray = {this.state.orderArray}/>} />
+        </Switch>
         </main>
+        </BrowserRouter>
       </ThemeProvider>
     );
   }
